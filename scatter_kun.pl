@@ -132,6 +132,12 @@ sub file_remove {
 sub add_scatter {
     my ($name, $key, $value) = @_;
 
+    if ( $value eq $r->hget($name, $key) ) {
+        my $msg = "DATA EXIST: " . $url . $name . ".html";
+        return $msg;
+    }
+
+    $r->hset($name, $key, $value);
     createe_scatter_view($name, $key, $value);
 }
 
