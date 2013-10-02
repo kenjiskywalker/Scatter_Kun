@@ -120,7 +120,7 @@ sub create_scatter_view {
     return $msg;
 }
 
-sub file_remove {
+sub remove_file {
     my $name = shift;
     my $file = $filepath . $name . ".html";
 
@@ -158,7 +158,7 @@ sub delete_scatter {
     }
     else
     {
-        file_remove($name);
+        remove_file($name);
     }
 }
 
@@ -166,7 +166,7 @@ sub all_delete_scatter {
     my $name = shift;
     $r->del($name);
 
-    file_remove($name);
+    remove_file($name);
 }
 
 1;
