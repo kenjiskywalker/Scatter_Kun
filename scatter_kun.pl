@@ -31,7 +31,7 @@ my $value_name   = "score";
 
 $unazu_san->on_message(
     qr/^$unazu_san->{nickname}:\s+([\w\-.]+)\s+([\w\-.]+)\s+([\d\-.]+)\s+([\d\-.]+)/ => sub {
-        my ($receive, $name, $state, $key, $value) = @_;
+        my ($receive, $state, $name, $key, $value) = @_;
 
         if ($state eq "ADD") {
             warn "ADD";
@@ -52,11 +52,11 @@ $unazu_san->on_message(
         else {
             warn "ELSE";
             $receive = shift;
-            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
+            $receive->reply('state[ADD|DEL|ALLDEL] hoge[graph_name] n[key] m[value]');
         }
     },
     qr/^$unazu_san->{nickname}:\s+([\w\-.]+)\s+([\w\-.]+)/ => sub {
-        my ($receive, $name, $state, $key, $value) = @_;
+        my ($receive, $state, $name, $key, $value) = @_;
         if ($state eq "ALLDEL") {
             warn "ALLDEL";
             my $msg = all_delete_scatter($name);
@@ -66,13 +66,13 @@ $unazu_san->on_message(
         else {
             warn "ELSE";
             $receive = shift;
-            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
+            $receive->reply('state[ADD|DEL|ALLDEL] hoge[graph_name] n[key] m[value]');
         }
     },
     qr/^$unazu_san->{nickname}:/ => sub {
         my ($receive, $match) = @_;
         $receive = shift;
-        $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
+        $receive->reply('state[ADD|DEL|ALLDEL] hoge[graph_name] n[key] m[value]');
     },
 );
 
