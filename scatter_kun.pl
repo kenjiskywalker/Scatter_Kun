@@ -106,7 +106,7 @@ sub create_scatter_view {
     my $file = $filepath . $name.".html";
 
     my $msg;
-    if (-f $file){
+    if (-f $file) {
         $msg = "ADD: " . $url . $name . ".html";
     }
     else {
@@ -125,7 +125,7 @@ sub file_remove {
     my $file = $filepath . $name . ".html";
 
     my $msg;
-    if (-f $file){
+    if (-f $file) {
         unlink($file);
         $msg = $url . $name . ".html";
         $msg = "FILE DETETE: " . $url . $name . ".html";
@@ -153,7 +153,7 @@ sub delete_scatter {
     my ($name, $key, $value) = @_;
     $r->hdel($name, $key, $value);
 
-    if (0 < $r->hlen($name)){
+    if (0 < $r->hlen($name)) {
         create_scatter_view($name, $key, $value);
     }
     else
