@@ -71,6 +71,7 @@ $unazu_san->on_message(
     },
     qr/^$unazu_san->{nickname}:/ => sub {
         my ($receive, $match) = @_;
+        warn "ELSE";
         $receive = shift;
         $receive->reply('state[ADD|DEL|ALLDEL] hoge[graph_name] n[key] m[value]');
     },
