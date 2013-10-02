@@ -104,9 +104,9 @@ sub createe_scatter_view {
 
     my $file = $filepath . $name.".html";
 
-    open(my $fh, '>', $file);
+    open my $fh, '>', $file or die $!;
     print($fh $html);
-    close($fh);
+    close $fh or die $!;
 
     my $msg = $url . $name . ".html";
     return $msg;
