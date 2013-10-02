@@ -1,7 +1,7 @@
 
 ## これは何ですか
 
-これはIRC botで、`操作`、`ファイル名`、`値1`、`値2｀を渡すことで  
+これはIRC botで、`操作`、`ファイル名`、`値1`、`値2`を渡すことで  
 `ファイル名`に`値1`、`値2`の数値を利用し、分布図っぽい画像を生成します。  
 画像生成するにあたり、Redisのhash機能を利用します。
 
@@ -73,3 +73,9 @@ my $value_name   = "score";
 ファイルのデータが空になるか、`ALLDEL`でデータを全削除するとファイルも削除されます。
 
 ![https://dl.dropboxusercontent.com/u/5390179/testgraph.png](https://dl.dropboxusercontent.com/u/5390179/testgraph3.png)
+
+
+```
+24:00 kenjiskywalker_: scatter_kun: ALLDEL testgraph
+24:00 scatter_kun: FILE DETETE: http://www.kenjiskywalker.org/scatter/testgraph.html
+```
