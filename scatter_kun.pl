@@ -104,11 +104,18 @@ sub createe_scatter_view {
 
     my $file = $filepath . $name.".html";
 
+    my $msg;
+    if (-f $file){
+        $msg = "ADD: " . $url . $name . ".html";
+    }
+    else {
+        $msg = "FILE CREATE: " . $url . $name . ".html";
+    }
+
     open my $fh, '>', $file or die $!;
     print($fh $html);
     close $fh or die $!;
 
-    my $msg = $url . $name . ".html";
     return $msg;
 }
 
