@@ -78,7 +78,7 @@ $unazu_san->on_message(
 
 $unazu_san->run;
 
-sub createe_scatter_view {
+sub create_scatter_view {
     my ($name, $key, $value) = @_;
 
     my $vpath = Data::Section::Simple->new()->get_data_section();
@@ -145,7 +145,7 @@ sub add_scatter {
     }
 
     $r->hset($name, $key, $value);
-    createe_scatter_view($name, $key, $value);
+    create_scatter_view($name, $key, $value);
 }
 
 sub delete_scatter {
@@ -153,7 +153,7 @@ sub delete_scatter {
     $r->hdel($name, $key, $value);
 
     if (0 < $r->hlen($name)){
-        createe_scatter_view($name, $key, $value);
+        create_scatter_view($name, $key, $value);
     }
     else
     {
