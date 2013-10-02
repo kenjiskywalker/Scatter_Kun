@@ -22,38 +22,41 @@ my $r = Redis->new(
     server => 'localhost:6379',
 );
 
-my $url      = "http://www.kenjiskywalker.org/scatter/";
-my $filepath = "/home/skywalker/www/scatter/";
+my $url          = "http://www.kenjiskywalker.org/scatter/";
+my $filepath     = "/home/skywalker/www/scatter/";
+my $scatter_name = "benchmark";
+my $key_name     = "concurrency";
+my $value_name   = "score";
 
 
 $unazu_san->on_message(
     qr/^$unazu_san->{nickname}:\s+([\w\-.]+)\s+([\w\-.]+)\s+([\d\-.]+)\s+([\d\-.]+)/ => sub {
-        my ($receive, $name, $state, $concurrency, $score) = @_;
+        my ($receive, $name, $state, $key, $value) = @_;
 
         if ($state eq "ADD") {
             warn "ADD";
-            my $msg = add_scatter($name, $concurrency, $score);
+            my $msg = add_scatter($name, $key, $value);
             warn $msg;
 
-            $receive->reply("ADD"." ".$name." ".$concurrency." ".$score);
+            $receive->reply("ADD"." ".$name." ".$key." ".$value);
             $receive->reply("$msg");
         }
         elsif ($state eq "DEL") {
             warn "DEL";
-            my $msg = delete_scatter($name, $concurrency, $score);
+            my $msg = delete_scatter($name, $key, $value);
             warn $msg;
 
-            $receive->reply("DEL "." ".$name." ".$concurrency." ".$score);
+            $receive->reply("DEL "." ".$name." ".$key." ".$value);
             $receive->reply("$msg");
         }
         else {
             warn "ELSE";
             $receive = shift;
-            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[concurrency] m[score]');
+            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
         }
     },
     qr/^$unazu_san->{nickname}:\s+([\w\-.]+)\s+([\w\-.]+)/ => sub {
-        my ($receive, $name, $state, $concurrency, $score) = @_;
+        my ($receive, $name, $state, $key, $value) = @_;
         if ($state eq "ALLDEL") {
             warn "ALLDEL";
             my $msg = all_delete_scatter($name);
@@ -63,36 +66,39 @@ $unazu_san->on_message(
         else {
             warn "ELSE";
             $receive = shift;
-            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[concurrency] m[score]');
+            $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
         }
     },
     qr/^$unazu_san->{nickname}:/ => sub {
         my ($receive, $match) = @_;
         $receive = shift;
-        $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[concurrency] m[score]');
+        $receive->reply('hoge[graph_name] state[ADD|DEL|ALLDEL] n[key] m[value]');
     },
 );
 
 $unazu_san->run;
 
 sub createe_scatter_view {
-    my ($name, $concurrency, $score) = @_;
+    my ($name, $key, $value) = @_;
 
     my $vpath = Data::Section::Simple->new()->get_data_section();
     my $tx    = Text::Xslate->new(path => [$vpath]);
 
-    my @concurrency_list = $r->hkeys($name);
+    my @key_list = $r->hkeys($name);
 
-    my %name_concurrency_scores;
-    for my $key (@concurrency_list){
-        my $score = $r->hget($name, $key);
-        $name_concurrency_scores{"$key"} = $score;
+    my %name_keys_values;
+    for my $key (@key_list){
+        my $value = $r->hget($name, $key);
+        $name_keys_values{"$key"} = $value;
     }
 
     my $html = $tx->render("template.tx",
         {
-            name => $name,
-            data => \%name_concurrency_scores,
+            scatter_name => $scatter_name,
+            key_name     => $key_name,
+            value_name   => $value_name,
+            name         => $name,
+            data         => \%name_keys_values,
         }
     );
 
@@ -124,18 +130,17 @@ sub file_remove {
 
 
 sub add_scatter {
-    my ($name, $concurrency, $score) = @_;
-    $r->hset($name, $concurrency, $score);
+    my ($name, $key, $value) = @_;
 
-    createe_scatter_view($name, $concurrency, $score);
+    createe_scatter_view($name, $key, $value);
 }
 
 sub delete_scatter {
-    my ($name, $concurrency, $score) = @_;
-    $r->hdel($name, $concurrency, $score);
+    my ($name, $key, $value) = @_;
+    $r->hdel($name, $key, $value);
 
     if (0 < $r->hlen($name)){
-        createe_scatter_view($name, $concurrency, $score);
+        createe_scatter_view($name, $key, $value);
     }
     else
     {
@@ -163,16 +168,16 @@ __DATA__
       google.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['concurrency', 'score'],
+          ['<: $key_name :>', '<: $value_name :>'],
 : for $data.keys() -> $d {
           [ <: $d :>, <: $data[$d] :> ],
 : }
         ]);
 
         var options = {
-        title: '<: $name :> benchmark',
-          hAxis: {title: 'concurrency', minValue: 0, maxValue: 15},
-          vAxis: {title: 'score', minValue: 0, maxValue: 15},
+        title: '<: $name :> <: $scatter_name :> ',
+          hAxis: {title: '<: $key_name :>', minValue: 0, maxValue: 15},
+          vAxis: {title: '<: $value_name :>', minValue: 0, maxValue: 15},
           legend: 'none'
         };
 
